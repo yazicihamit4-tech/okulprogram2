@@ -530,6 +530,62 @@
       </div>
     </div>
 
+    <!-- ÜCRET BELİRLEME TABLOSU -->
+    <div style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+      <h3 style="margin-top: 0; margin-bottom: 20px; font-size: 16px; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 20px;">⚙️</span> ÜCRET BELİRLEME TABLOSU
+      </h3>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; align-items: end;">
+        <!-- Manuel Girilenler -->
+        <div class="form-group" style="margin-bottom:0;">
+          <label>1- Aylık İçin Belirlenen Katsayı</label>
+          <input type="number" id="yeni_salCoefficient" value="1.39" step="0.01">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>2- Gündüz Öğretimi Göstergesi</label>
+          <input type="number" id="yeni_salIndicator" value="140">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>3- Kulüpte Yemek Hizmeti Veriliyor Mu?</label>
+          <select id="yeni_salFoodService">
+            <option value="evet">EVET</option>
+            <option value="hayir">HAYIR</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>4- Okulun Belirlediği Saat Ücreti</label>
+          <input type="number" id="yeni_salHourlyRate" value="64.00" step="0.01">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#2563eb;">5- Günlük Kulüp Etkinlik Saati Sayısı <small>(Manuel)</small></label>
+          <input type="number" id="yeni_salDailyHours" placeholder="Örn: 4" style="border-color:#bfdbfe; background:#eff6ff;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#2563eb;">6- Aylık İş Günü Sayısı <small>(Manuel)</small></label>
+          <input type="number" id="yeni_salWorkDays" placeholder="Örn: 20" style="border-color:#bfdbfe; background:#eff6ff;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#2563eb;">8- Kulübe Katılan Çocuk Sayısı <small>(Manuel)</small></label>
+          <input type="number" id="yeni_salStudentCount" placeholder="Örn: 90" style="border-color:#bfdbfe; background:#eff6ff;">
+        </div>
+
+        <!-- Otomatik Hesaplananlar -->
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#059669;">7- Okulun Belirlediği Aylık Ücret</label>
+          <input type="text" id="yeni_salMonthlyFee" placeholder="Oto: Saat x Gün x İş Günü" readonly style="background:#ecfdf5; border-color:#a7f3d0; color:#065f46; font-weight:bold;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#059669;">9- Aylık Aidat Toplamı</label>
+          <input type="text" id="yeni_salTotalPool" placeholder="Oto: Aylık Ücret x Çocuk" readonly style="background:#ecfdf5; border-color:#a7f3d0; color:#065f46; font-weight:bold;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#059669;">10- En Yüksek Devlet Memuru Brüt Aylığı</label>
+          <input type="text" id="yeni_salCivilServant" placeholder="Oto: Katsayı x 9500" readonly style="background:#ecfdf5; border-color:#a7f3d0; color:#065f46; font-weight:bold;">
+        </div>
+      </div>
+    </div>
+
     <!-- Arka plan hesaplamaları için gizli alanlar (kullanıcı görmeyecek) -->
     <div style="display:none;" id="maasHesaplamaAyarlariGirdi">
       <input type="month" id="salMonth">
@@ -1458,9 +1514,8 @@
     $("salDailyHours").value = 4; // Default
     $("salGroupCount").value = 1; // Default
 
-    autoCalculatePool('hours_days'); // Compute total pool based on new logic
-
-    renderSalaries();
+    // Geriye dönük uyumluluk: eski autoCalculatePool artık yok, updateNewPricingTable kullanılıyor
+    // renderSalaries(); // updateNewPricingTable içerisinde çağrıldığı için burada çağırmaya gerek yok
     salaryModal.style.display = "flex";
   }
 
@@ -1644,49 +1699,61 @@
 
   if($("btnCalcSalaries")) $("btnCalcSalaries").onclick = renderSalaries;
 
-  // Otomatik Toplam Havuz Hesaplama (Saat Ücreti * Günlük Saat * İş Günü Sayısı * Grup Sayısı * Öğrenci)
-  function autoCalculatePool(source) {
-    const hourlyRate = Number($("salHourlyRate")?.value) || 0;
-    const dailyHours = Number($("salDailyHours")?.value) || 0;
-    const workDays = Number($("salWorkDays")?.value) || 0;
-    const groupCount = Number($("salGroupCount")?.value) || 0;
-    const studentCount = Number($("salStudentCount")?.value) || 0;
-    const coefficient = Number($("salCoefficient")?.value) || 0;
+  // Yeni Ücret Belirleme Tablosu İçin Hesaplamalar
+  function updateNewPricingTable() {
+    // Girdileri al
+    const coefficient = Number($("yeni_salCoefficient").value) || 0;
+    const hourlyRate = Number($("yeni_salHourlyRate").value) || 0;
+    const dailyHours = Number($("yeni_salDailyHours").value) || 0;
+    const workDays = Number($("yeni_salWorkDays").value) || 0;
+    const studentCount = Number($("yeni_salStudentCount").value) || 0;
 
-    if (source === 'coeff') {
-      const civilServantAylik = coefficient * 9500;
-      if ($("salCivilServant")) $("salCivilServant").value = civilServantAylik.toFixed(2);
-    }
+    // 7- Okulun Belirlediği Aylık Ücret: Saat Ücreti X Günlük Saat X İş Günü
+    const monthlyFee = hourlyRate * dailyHours * workDays;
+    $("yeni_salMonthlyFee").value = formatTL(monthlyFee);
 
-    // Eğer saat veya iş günü değiştiyse aylık ders saatini güncelle
-    if (source === 'hours_days') {
-      const totalLessons = dailyHours * workDays;
-      if ($("salTotalLessons")) $("salTotalLessons").value = totalLessons;
-    }
+    // 9- Aylık Aidat Toplamı: Aylık Ücret X Çocuk Sayısı
+    const totalPool = monthlyFee * studentCount;
+    $("yeni_salTotalPool").value = formatTL(totalPool);
 
-    // Ders saati değişirse ya da hesaplandıysa
-    const totalLessons = Number($("salTotalLessons")?.value) || 0;
+    // 10- En Yüksek Devlet Memuru Brüt Aylığı: Katsayı X 9500
+    const civilServant = coefficient * 9500;
+    $("yeni_salCivilServant").value = formatTL(civilServant);
 
-    // Aylık Bir Çocuk Ücreti = Saat Ücreti * Aylık Toplam Ders Sayısı
-    const monthlyFee = hourlyRate * totalLessons;
-    if ($("salMonthlyFee")) $("salMonthlyFee").value = monthlyFee;
+    // Eski arka plan hesaplamalarını besle ki sistem bozulmasın
+    if($("salTotalPool")) $("salTotalPool").value = totalPool;
+    if($("salCivilServant")) $("salCivilServant").value = civilServant;
+    if($("salHourlyRate")) $("salHourlyRate").value = hourlyRate;
+    if($("salDailyHours")) $("salDailyHours").value = dailyHours;
+    if($("salWorkDays")) $("salWorkDays").value = workDays;
 
-    // Toplam Havuz = Aylık Ücret * Öğrenci Sayısı
-    const pool = monthlyFee * studentCount;
-    if($("salTotalPool")) {
-      $("salTotalPool").value = pool;
-    }
+    // Maaşları ve Özet Tablosunu yenile
+    renderSalaries();
   }
 
-  // Event listenerları bağlayalım
-  if($("salHourlyRate")) $("salHourlyRate").addEventListener("input", () => autoCalculatePool('rate'));
-  if($("salDailyHours")) $("salDailyHours").addEventListener("input", () => autoCalculatePool('hours_days'));
-  if($("salWorkDays")) $("salWorkDays").addEventListener("input", () => autoCalculatePool('hours_days'));
-  if($("salTotalLessons")) $("salTotalLessons").addEventListener("input", () => autoCalculatePool('lessons'));
-  if($("salStudentCount")) $("salStudentCount").addEventListener("input", () => autoCalculatePool('students'));
-  if($("salGroupCount")) $("salGroupCount").addEventListener("input", () => autoCalculatePool('group'));
-  if($("salCoefficient")) $("salCoefficient").addEventListener("input", () => autoCalculatePool('coeff'));
-  if($("salIndicator")) $("salIndicator").addEventListener("input", () => autoCalculatePool('indicator'));
+  // Yeni tablodaki inputlara event listener ekle
+  const yeniInputIds = [
+    "yeni_salCoefficient", "yeni_salIndicator", "yeni_salHourlyRate",
+    "yeni_salDailyHours", "yeni_salWorkDays", "yeni_salStudentCount"
+  ];
+  yeniInputIds.forEach(id => {
+    if($(id)) {
+      $(id).addEventListener("input", updateNewPricingTable);
+    }
+  });
+
+  // Modal açıldığında da güncelleyelim (eski logic yerine)
+  const oldOpenSalaryModal = openSalaryModal;
+  window.openSalaryModal = function() {
+    oldOpenSalaryModal(); // bu salMonth gibi şeyleri ayarlar
+
+    // Öğrenci sayısını otomatik olarak tablodan çekip doldurabiliriz (opsiyonel)
+    if(!$("yeni_salStudentCount").value) {
+      $("yeni_salStudentCount").value = state.students.length;
+    }
+
+    updateNewPricingTable();
+  }
 
   // Özel yüzde göster/gizle
   if($("pRole")) {
