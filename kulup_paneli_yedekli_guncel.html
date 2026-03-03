@@ -586,6 +586,44 @@
       </div>
     </div>
 
+    <!-- DERS SAATİ TOPLAMI BELİRLEME TABLOSU -->
+    <div style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+      <h3 style="margin-top: 0; margin-bottom: 20px; font-size: 16px; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 20px;">⏱️</span> DERS SAATİ TOPLAMI BELİRLEME TABLOSU
+      </h3>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; align-items: end;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#2563eb;">1- Kulüp Grup (sınıf) Sayısı <small>(Manuel)</small></label>
+          <input type="number" id="yeni_dersGroupCount" placeholder="Örn: 2" style="border-color:#bfdbfe; background:#eff6ff;" value="1">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#2563eb;">2- Günlük Ders Saati Toplamı <small>(Manuel)</small></label>
+          <input type="number" id="yeni_dersDailyTotal" placeholder="Örn: 4" style="border-color:#bfdbfe; background:#eff6ff;" value="4">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>3- Ders Yapılan Gün Sayısı</label>
+          <input type="number" id="yeni_dersWorkDays" readonly style="background:#f1f5f9; border-color:#cbd5e1; color:#64748b;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#059669;">4- Aylık Toplam Ders Sayısı</label>
+          <input type="number" id="yeni_dersMonthlyTotal" readonly style="background:#ecfdf5; border-color:#a7f3d0; color:#065f46; font-weight:bold;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#2563eb;">5- KOORDİNATÖRLÜK <small>(Manuel)</small></label>
+          <input type="number" id="yeni_dersCoordinator" placeholder="Örn: 10" style="border-color:#bfdbfe; background:#eff6ff;" value="0">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#059669;">6- GENEL TOPLAM</label>
+          <input type="number" id="yeni_dersGrandTotal" readonly style="background:#ecfdf5; border-color:#a7f3d0; color:#065f46; font-weight:bold;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#9333ea;">7- SAAT ÜCRETİ (Hesaplanan)</label>
+          <input type="text" id="yeni_dersHourlyRateCalculated" readonly style="background:#fdf4ff; border-color:#f5d0fe; color:#86198f; font-weight:bold;">
+        </div>
+      </div>
+    </div>
+
     <!-- Arka plan hesaplamaları için gizli alanlar (kullanıcı görmeyecek) -->
     <div style="display:none;" id="maasHesaplamaAyarlariGirdi">
       <input type="month" id="salMonth">
@@ -1567,6 +1605,9 @@
     const teacherPoolTotal = totalPool * 0.55;
     const teacherPerPerson = teacherPoolCount > 0 ? (teacherPoolTotal / teacherPoolCount) : 0;
 
+    // Ders saati tablosunda hesaplanan saat ücreti
+    const calculatedHourlyRate = window.calculatedDersSaatUcreti || hourlyRate;
+
     // Hesaplamalar
     let totalGross = 0;
     let totalTax1 = 0;
@@ -1594,9 +1635,23 @@
         maxGross = tavanCleaning;
       }
       else if(p.role === "teacher_pool") {
-        gross = teacherPerPerson;
         let isCoordinator = p.name.toLowerCase().includes("koordinatör");
-        maxGross = isCoordinator ? tavanManager : tavanTeacher;
+        let isUsta = p.name.toLowerCase().includes("usta öğretici");
+
+        // Yeni Kural: Öğretmen, Koordinatör ve Usta Öğreticiler için maaş =
+        // Ders Yapılan Gün Sayısı * Günlük Ders Saati Toplamı * Hesaplanan Saat Ücreti
+        // (Eğer isimlerinde bunlar geçiyorsa yeni formülü uyguluyoruz, yoksa eski havuza göre hesaplar)
+        if (p.name.toLowerCase().includes("öğretmen") || isCoordinator || isUsta) {
+           const dailyTotalLessons = Number($("yeni_dersDailyTotal").value) || 0;
+           // p.customLessons diyerek kişi bazlı bir ders saati de olabilirdi, ama genel "Günlük Ders Saati" ile çarpıyoruz
+           // Öğretmenlerin aylık girdiği toplam ders saati: Günlük Ders Saati * Aylık İş Günü
+           const aylikDersSayisi = dailyTotalLessons * workDays;
+           gross = aylikDersSayisi * calculatedHourlyRate;
+        } else {
+           // Havuzu eşit bölme varsayımı (isim belirtilmemişse)
+           gross = teacherPerPerson;
+        }
+        maxGross = isCoordinator ? tavanManager : (isUsta ? tavanUsta : tavanTeacher);
       }
       else if(p.role === "custom") {
         gross = totalPool * (Number(p.percent) / 100);
@@ -1727,14 +1782,47 @@
     if($("salDailyHours")) $("salDailyHours").value = dailyHours;
     if($("salWorkDays")) $("salWorkDays").value = workDays;
 
+    // Ders Saati Tablosu'nu da güncelle (çünkü totalPool ve workDays değişmiş olabilir)
+    updateDersSaatiTablosu(totalPool, workDays);
+
     // Maaşları ve Özet Tablosunu yenile
     renderSalaries();
+  }
+
+  function updateDersSaatiTablosu(totalPool, workDays) {
+    if (!$("yeni_dersGroupCount")) return;
+
+    const groupCount = Number($("yeni_dersGroupCount").value) || 0;
+    const dailyTotal = Number($("yeni_dersDailyTotal").value) || 0;
+    const coordinator = Number($("yeni_dersCoordinator").value) || 0;
+
+    // 3- Ders Yapılan Gün Sayısı'nı güncelle
+    $("yeni_dersWorkDays").value = workDays;
+
+    // 4- Aylık Toplam Ders Sayısı: Kulüp Grup X Günlük Ders Saati X Ders Yapılan Gün
+    const monthlyTotalLessons = groupCount * dailyTotal * workDays;
+    $("yeni_dersMonthlyTotal").value = monthlyTotalLessons;
+
+    // 6- GENEL TOPLAM: Aylık Toplam Ders + KOORDİNATÖRLÜK
+    const grandTotal = monthlyTotalLessons + coordinator;
+    $("yeni_dersGrandTotal").value = grandTotal;
+
+    // 7- SAAT ÜCRETİ (Hesaplanan): Aylık Aidat Toplamı X 0.55 / Genel Toplam
+    let calculatedHourlyRate = 0;
+    if (grandTotal > 0) {
+      calculatedHourlyRate = (totalPool * 0.55) / grandTotal;
+    }
+    $("yeni_dersHourlyRateCalculated").value = formatTL(calculatedHourlyRate);
+
+    // Arkaplana hesaplanan saat ücretini aktaralım
+    window.calculatedDersSaatUcreti = calculatedHourlyRate;
   }
 
   // Yeni tablodaki inputlara event listener ekle
   const yeniInputIds = [
     "yeni_salCoefficient", "yeni_salIndicator", "yeni_salHourlyRate",
-    "yeni_salDailyHours", "yeni_salWorkDays", "yeni_salStudentCount"
+    "yeni_salDailyHours", "yeni_salWorkDays", "yeni_salStudentCount",
+    "yeni_dersGroupCount", "yeni_dersDailyTotal", "yeni_dersCoordinator"
   ];
   yeniInputIds.forEach(id => {
     if($(id)) {
@@ -1845,13 +1933,27 @@
         else if(p.role === "deputy") gross = totalPool * 0.05;
         else if(p.role === "accounting") gross = totalPool * 0.02;
         else if(p.role === "cleaning") gross = totalPool * 0.04;
-        else if(p.role === "teacher_pool") gross = teacherPerPerson;
+        else if(p.role === "teacher_pool") {
+          let isCoordinator = p.name.toLowerCase().includes("koordinatör");
+          let isUsta = p.name.toLowerCase().includes("usta öğretici");
+          if (p.name.toLowerCase().includes("öğretmen") || isCoordinator || isUsta) {
+             const calculatedHourlyRateExcel = window.calculatedDersSaatUcreti || hourlyRate;
+             const dailyTotalLessons = Number($("yeni_dersDailyTotal").value) || 0;
+             const aylikDersSayisi = dailyTotalLessons * workDays;
+             gross = aylikDersSayisi * calculatedHourlyRateExcel;
+          } else {
+             gross = teacherPerPerson;
+          }
+        }
         else if(p.role === "custom") gross = totalPool * (Number(p.percent) / 100);
 
         let multiplier = 2.0; // default for unknown/accounting/cleaning/custom
         if(p.role === "manager") multiplier = 2.75;
         else if(p.role === "deputy") multiplier = 2.5;
-        else if(p.role === "teacher_pool") multiplier = isCoordinator ? 2.75 : 4.0;
+        else if(p.role === "teacher_pool") {
+          let isCoordinator = p.name.toLowerCase().includes("koordinatör");
+          multiplier = isCoordinator ? 2.75 : 4.0;
+        }
         else if(p.role === "accounting" || p.role === "cleaning") multiplier = 2.0;
 
         let maxGross = baseSalary * multiplier;
