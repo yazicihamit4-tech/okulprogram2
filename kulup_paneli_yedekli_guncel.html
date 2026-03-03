@@ -491,65 +491,154 @@
       <button class="close-btn" id="btnCloseSalaryModal">×</button>
     </div>
 
-    <!-- Maaş Hesaplama Ayarları -->
-    <div style="background:#f8fafc; padding:16px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:16px; display:flex; flex-direction:column; gap:16px;">
-      <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;">
-        <div class="form-group" style="margin-bottom:0; flex:1; min-width:140px;">
-          <label>Ay Seçimi</label>
-          <input type="month" id="salMonth" style="padding:10px; font-size:13px;">
+    <!-- GİDER KALEMLERİ ÖZET TABLOSU -->
+    <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+      <div style="font-size: 16px; font-weight: 900; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+        <span>GİDER KALEMLERİ ÖZET TABLOSU</span>
+        <span style="font-size: 14px; font-weight: normal; opacity: 0.9;">Aylık Aidat Toplamı (Havuz): <strong id="summaryTotalPool" style="font-size: 16px;">0 TL</strong></span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;">
+        <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">1- Temel Giderler (Materyal, Beslenme, SGK vb.) %26</div>
+          <div style="font-size: 16px; font-weight: 900; color: #38bdf8;" id="sumTemelGider">0,00 TL</div>
         </div>
-        <div class="form-group" style="margin-bottom:0; flex:1; min-width:140px;">
-          <label>Öğrenci Sayısı</label>
-          <input type="number" id="salStudentCount" placeholder="Örn: 90" style="padding:10px; font-size:13px;">
+        <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">2- Denetleme Yetkilisi %1</div>
+          <div style="font-size: 16px; font-weight: 900; color: #a78bfa;" id="sumDenetleme">0,00 TL</div>
         </div>
-        <div class="form-group" style="margin-bottom:0; flex:1; min-width:140px;">
-          <label>Toplam Havuz (TL)</label>
-          <input type="number" id="salTotalPool" placeholder="Oto: Hesaplanan" style="padding:10px; font-size:13px; background-color:#f1f5f9;" readonly>
+        <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">3- Kulüp Yönetim Kurulu Bşk. (Müdür) %7</div>
+          <div style="font-size: 16px; font-weight: 900; color: #f472b6;" id="sumMudur">0,00 TL</div>
         </div>
-        <div class="form-group" style="margin-bottom:0; flex:1; min-width:140px;">
-          <label>Çalışma Gün Sayısı</label>
-          <input type="number" id="salWorkDays" placeholder="Örn: 20" style="padding:10px; font-size:13px;">
+        <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">4- Kulüp Yönetim Kurulu Üyesi (Md. Yrd.) %5</div>
+          <div style="font-size: 16px; font-weight: 900; color: #fb923c;" id="sumMdYrd">0,00 TL</div>
         </div>
-        <div class="form-group" style="margin-bottom:0; flex:1; min-width:140px;">
-          <label>Günlük Etkinlik Saati</label>
-          <input type="number" id="salDailyHours" placeholder="Örn: 4" value="4" style="padding:10px; font-size:13px;">
+        <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">5- Öğretmen, Usta Öğr. ve Koordinatör %55</div>
+          <div style="font-size: 16px; font-weight: 900; color: #34d399;" id="sumOgretmen">0,00 TL</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">6- Yazışma-Muhasebe İşleri Personeli %2</div>
+          <div style="font-size: 16px; font-weight: 900; color: #facc15;" id="sumMuhasebe">0,00 TL</div>
+        </div>
+        <div style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+          <div style="font-size: 11px; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">7- Temizlik Bakım ve Beslenme Personeli %4</div>
+          <div style="font-size: 16px; font-weight: 900; color: #e879f9;" id="sumTemizlik">0,00 TL</div>
         </div>
       </div>
-      <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end; margin-bottom: 12px;">
-        <div class="form-group" style="margin-bottom:0; flex:1; min-width:140px;">
-          <label>Aylık Toplam Ders Sayısı</label>
-          <input type="number" id="salTotalLessons" placeholder="Oto/Manuel: 80" style="padding:10px; font-size:13px;">
+    </div>
+
+    <!-- ÜCRET BELİRLEME TABLOSU -->
+    <div style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+      <h3 style="margin-top: 0; margin-bottom: 20px; font-size: 16px; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 20px;">⚙️</span> ÜCRET BELİRLEME TABLOSU
+      </h3>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; align-items: end;">
+        <!-- Manuel Girilenler -->
+        <div class="form-group" style="margin-bottom:0;">
+          <label>1- Aylık İçin Belirlenen Katsayı</label>
+          <input type="number" id="yeni_salCoefficient" value="1.39" step="0.01">
         </div>
-        <div class="form-group" style="margin-bottom:0; flex:1; min-width:140px;">
-          <label>Saat Ücreti (TL)</label>
-          <input type="number" id="salHourlyRate" value="64" style="padding:10px; font-size:13px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>2- Gündüz Öğretimi Göstergesi</label>
+          <input type="number" id="yeni_salIndicator" value="140">
         </div>
-        <div class="form-group" style="margin-bottom:0; flex:1; min-width:140px;">
-          <label>Grup (Sınıf) Sayısı</label>
-          <input type="number" id="salGroupCount" placeholder="Örn: 1" value="1" style="padding:10px; font-size:13px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>3- Kulüpte Yemek Hizmeti Veriliyor Mu?</label>
+          <select id="yeni_salFoodService">
+            <option value="evet">EVET</option>
+            <option value="hayir">HAYIR</option>
+          </select>
         </div>
-        <div class="form-group" style="margin-bottom:0; flex:1; min-width:140px;">
-          <label>Aylık Bir Çocuk Ücreti</label>
-          <input type="number" id="salMonthlyFee" placeholder="Oto Hesaplanan" style="padding:10px; font-size:13px; background-color:#f1f5f9;" readonly>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>4- Okulun Belirlediği Saat Ücreti</label>
+          <input type="number" id="yeni_salHourlyRate" value="64.00" step="0.01">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#2563eb;">5- Günlük Kulüp Etkinlik Saati Sayısı <small>(Manuel)</small></label>
+          <input type="number" id="yeni_salDailyHours" placeholder="Örn: 4" style="border-color:#bfdbfe; background:#eff6ff;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#2563eb;">6- Aylık İş Günü Sayısı <small>(Manuel)</small></label>
+          <input type="number" id="yeni_salWorkDays" placeholder="Örn: 20" style="border-color:#bfdbfe; background:#eff6ff;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#2563eb;">8- Kulübe Katılan Çocuk Sayısı <small>(Manuel)</small></label>
+          <input type="number" id="yeni_salStudentCount" placeholder="Örn: 90" style="border-color:#bfdbfe; background:#eff6ff;">
+        </div>
+
+        <!-- Otomatik Hesaplananlar -->
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#059669;">7- Okulun Belirlediği Aylık Ücret</label>
+          <input type="text" id="yeni_salMonthlyFee" placeholder="Oto: Saat x Gün x İş Günü" readonly style="background:#ecfdf5; border-color:#a7f3d0; color:#065f46; font-weight:bold;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#059669;">9- Aylık Aidat Toplamı</label>
+          <input type="text" id="yeni_salTotalPool" placeholder="Oto: Aylık Ücret x Çocuk" readonly style="background:#ecfdf5; border-color:#a7f3d0; color:#065f46; font-weight:bold;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#059669;">10- En Yüksek Devlet Memuru Brüt Aylığı</label>
+          <input type="text" id="yeni_salCivilServant" placeholder="Oto: Katsayı x 9500" readonly style="background:#ecfdf5; border-color:#a7f3d0; color:#065f46; font-weight:bold;">
         </div>
       </div>
-      <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;">
-        <div class="form-group" style="margin-bottom:0; flex:1; min-width:140px;">
-          <label>Aylık İçin Katsayı</label>
-          <input type="number" id="salCoefficient" value="1.387871" step="0.000001" style="padding:10px; font-size:13px;">
+    </div>
+
+    <!-- DERS SAATİ TOPLAMI BELİRLEME TABLOSU -->
+    <div style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+      <h3 style="margin-top: 0; margin-bottom: 20px; font-size: 16px; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 20px;">⏱️</span> DERS SAATİ TOPLAMI BELİRLEME TABLOSU
+      </h3>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; align-items: end;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#2563eb;">1- Kulüp Grup (sınıf) Sayısı <small>(Manuel)</small></label>
+          <input type="number" id="yeni_dersGroupCount" placeholder="Örn: 2" style="border-color:#bfdbfe; background:#eff6ff;" value="1">
         </div>
-        <div class="form-group" style="margin-bottom:0; flex:1; min-width:140px;">
-          <label>Gündüz Öğr. Göstergesi</label>
-          <input type="number" id="salIndicator" value="140" style="padding:10px; font-size:13px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#2563eb;">2- Günlük Ders Saati Toplamı <small>(Manuel)</small></label>
+          <input type="number" id="yeni_dersDailyTotal" placeholder="Örn: 4" style="border-color:#bfdbfe; background:#eff6ff;" value="4">
         </div>
-        <div class="form-group" style="margin-bottom:0; flex:1; min-width:140px;">
-          <label>Devlet Memuru Aylığı</label>
-          <input type="number" id="salCivilServant" value="13184.77" step="0.01" style="padding:10px; font-size:13px;" readonly>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>3- Ders Yapılan Gün Sayısı</label>
+          <input type="number" id="yeni_dersWorkDays" readonly style="background:#f1f5f9; border-color:#cbd5e1; color:#64748b;">
         </div>
-        <div style="flex:1; min-width:140px;">
-          <button class="big-btn" id="btnCalcSalaries" style="padding:10px 14px; margin:0; font-size:13px; width:100%;">Hesapla</button>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#059669;">4- Aylık Toplam Ders Sayısı</label>
+          <input type="number" id="yeni_dersMonthlyTotal" readonly style="background:#ecfdf5; border-color:#a7f3d0; color:#065f46; font-weight:bold;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#2563eb;">5- KOORDİNATÖRLÜK <small>(Manuel)</small></label>
+          <input type="number" id="yeni_dersCoordinator" placeholder="Örn: 10" style="border-color:#bfdbfe; background:#eff6ff;" value="0">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#059669;">6- GENEL TOPLAM</label>
+          <input type="number" id="yeni_dersGrandTotal" readonly style="background:#ecfdf5; border-color:#a7f3d0; color:#065f46; font-weight:bold;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label style="color:#9333ea;">7- SAAT ÜCRETİ (Hesaplanan)</label>
+          <input type="text" id="yeni_dersHourlyRateCalculated" readonly style="background:#fdf4ff; border-color:#f5d0fe; color:#86198f; font-weight:bold;">
         </div>
       </div>
+    </div>
+
+    <!-- Arka plan hesaplamaları için gizli alanlar (kullanıcı görmeyecek) -->
+    <div style="display:none;" id="maasHesaplamaAyarlariGirdi">
+      <input type="month" id="salMonth">
+      <input type="number" id="salStudentCount">
+      <input type="number" id="salTotalPool" readonly>
+      <input type="number" id="salWorkDays" value="20">
+      <input type="number" id="salDailyHours" value="4">
+      <input type="number" id="salTotalLessons">
+      <input type="number" id="salHourlyRate" value="64">
+      <input type="number" id="salGroupCount" value="1">
+      <input type="number" id="salMonthlyFee" readonly>
+      <input type="number" id="salCoefficient" value="1.387871">
+      <input type="number" id="salIndicator" value="140">
+      <input type="number" id="salCivilServant" value="13184.77" readonly>
+      <button id="btnCalcSalaries">Hesapla</button>
     </div>
 
     <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; justify-content:space-between;">
@@ -1463,9 +1552,8 @@
     $("salDailyHours").value = 4; // Default
     $("salGroupCount").value = 1; // Default
 
-    autoCalculatePool('hours_days'); // Compute total pool based on new logic
-
-    renderSalaries();
+    // Geriye dönük uyumluluk: eski autoCalculatePool artık yok, updateNewPricingTable kullanılıyor
+    // renderSalaries(); // updateNewPricingTable içerisinde çağrıldığı için burada çağırmaya gerek yok
     salaryModal.style.display = "flex";
   }
 
@@ -1485,6 +1573,16 @@
     tfoot.innerHTML = "";
 
     const totalPool = Number($("salTotalPool").value) || 0;
+
+    // Gider Kalemleri Özet Tablosu Güncellemesi
+    if ($("summaryTotalPool")) $("summaryTotalPool").textContent = formatTL(totalPool);
+    if ($("sumTemelGider")) $("sumTemelGider").textContent = formatTL(totalPool * 0.26);
+    if ($("sumDenetleme")) $("sumDenetleme").textContent = formatTL(totalPool * 0.01);
+    if ($("sumMudur")) $("sumMudur").textContent = formatTL(totalPool * 0.07);
+    if ($("sumMdYrd")) $("sumMdYrd").textContent = formatTL(totalPool * 0.05);
+    if ($("sumOgretmen")) $("sumOgretmen").textContent = formatTL(totalPool * 0.55);
+    if ($("sumMuhasebe")) $("sumMuhasebe").textContent = formatTL(totalPool * 0.02);
+    if ($("sumTemizlik")) $("sumTemizlik").textContent = formatTL(totalPool * 0.04);
     const civilServantAylik = Number($("salCivilServant").value) || 13184.77;
     const hourlyRate = Number($("salHourlyRate").value) || 64;
     const dailyHours = Number($("salDailyHours").value) || 4;
@@ -1506,6 +1604,9 @@
     const teacherPoolCount = state.personnel.filter(p => p.role === "teacher_pool").length;
     const teacherPoolTotal = totalPool * 0.55;
     const teacherPerPerson = teacherPoolCount > 0 ? (teacherPoolTotal / teacherPoolCount) : 0;
+
+    // Ders saati tablosunda hesaplanan saat ücreti
+    const calculatedHourlyRate = window.calculatedDersSaatUcreti || hourlyRate;
 
     // Hesaplamalar
     let totalGross = 0;
@@ -1534,9 +1635,23 @@
         maxGross = tavanCleaning;
       }
       else if(p.role === "teacher_pool") {
-        gross = teacherPerPerson;
         let isCoordinator = p.name.toLowerCase().includes("koordinatör");
-        maxGross = isCoordinator ? tavanManager : tavanTeacher;
+        let isUsta = p.name.toLowerCase().includes("usta öğretici");
+
+        // Yeni Kural: Öğretmen, Koordinatör ve Usta Öğreticiler için maaş =
+        // Ders Yapılan Gün Sayısı * Günlük Ders Saati Toplamı * Hesaplanan Saat Ücreti
+        // (Eğer isimlerinde bunlar geçiyorsa yeni formülü uyguluyoruz, yoksa eski havuza göre hesaplar)
+        if (p.name.toLowerCase().includes("öğretmen") || isCoordinator || isUsta) {
+           const dailyTotalLessons = Number($("yeni_dersDailyTotal").value) || 0;
+           // p.customLessons diyerek kişi bazlı bir ders saati de olabilirdi, ama genel "Günlük Ders Saati" ile çarpıyoruz
+           // Öğretmenlerin aylık girdiği toplam ders saati: Günlük Ders Saati * Aylık İş Günü
+           const aylikDersSayisi = dailyTotalLessons * workDays;
+           gross = aylikDersSayisi * calculatedHourlyRate;
+        } else {
+           // Havuzu eşit bölme varsayımı (isim belirtilmemişse)
+           gross = teacherPerPerson;
+        }
+        maxGross = isCoordinator ? tavanManager : (isUsta ? tavanUsta : tavanTeacher);
       }
       else if(p.role === "custom") {
         gross = totalPool * (Number(p.percent) / 100);
@@ -1639,49 +1754,94 @@
 
   if($("btnCalcSalaries")) $("btnCalcSalaries").onclick = renderSalaries;
 
-  // Otomatik Toplam Havuz Hesaplama (Saat Ücreti * Günlük Saat * İş Günü Sayısı * Grup Sayısı * Öğrenci)
-  function autoCalculatePool(source) {
-    const hourlyRate = Number($("salHourlyRate")?.value) || 0;
-    const dailyHours = Number($("salDailyHours")?.value) || 0;
-    const workDays = Number($("salWorkDays")?.value) || 0;
-    const groupCount = Number($("salGroupCount")?.value) || 0;
-    const studentCount = Number($("salStudentCount")?.value) || 0;
-    const coefficient = Number($("salCoefficient")?.value) || 0;
+  // Yeni Ücret Belirleme Tablosu İçin Hesaplamalar
+  function updateNewPricingTable() {
+    // Girdileri al
+    const coefficient = Number($("yeni_salCoefficient").value) || 0;
+    const hourlyRate = Number($("yeni_salHourlyRate").value) || 0;
+    const dailyHours = Number($("yeni_salDailyHours").value) || 0;
+    const workDays = Number($("yeni_salWorkDays").value) || 0;
+    const studentCount = Number($("yeni_salStudentCount").value) || 0;
 
-    if (source === 'coeff') {
-      const civilServantAylik = coefficient * 9500;
-      if ($("salCivilServant")) $("salCivilServant").value = civilServantAylik.toFixed(2);
-    }
+    // 7- Okulun Belirlediği Aylık Ücret: Saat Ücreti X Günlük Saat X İş Günü
+    const monthlyFee = hourlyRate * dailyHours * workDays;
+    $("yeni_salMonthlyFee").value = formatTL(monthlyFee);
 
-    // Eğer saat veya iş günü değiştiyse aylık ders saatini güncelle
-    if (source === 'hours_days') {
-      const totalLessons = dailyHours * workDays;
-      if ($("salTotalLessons")) $("salTotalLessons").value = totalLessons;
-    }
+    // 9- Aylık Aidat Toplamı: Aylık Ücret X Çocuk Sayısı
+    const totalPool = monthlyFee * studentCount;
+    $("yeni_salTotalPool").value = formatTL(totalPool);
 
-    // Ders saati değişirse ya da hesaplandıysa
-    const totalLessons = Number($("salTotalLessons")?.value) || 0;
+    // 10- En Yüksek Devlet Memuru Brüt Aylığı: Katsayı X 9500
+    const civilServant = coefficient * 9500;
+    $("yeni_salCivilServant").value = formatTL(civilServant);
 
-    // Aylık Bir Çocuk Ücreti = Saat Ücreti * Aylık Toplam Ders Sayısı
-    const monthlyFee = hourlyRate * totalLessons;
-    if ($("salMonthlyFee")) $("salMonthlyFee").value = monthlyFee;
+    // Eski arka plan hesaplamalarını besle ki sistem bozulmasın
+    if($("salTotalPool")) $("salTotalPool").value = totalPool;
+    if($("salCivilServant")) $("salCivilServant").value = civilServant;
+    if($("salHourlyRate")) $("salHourlyRate").value = hourlyRate;
+    if($("salDailyHours")) $("salDailyHours").value = dailyHours;
+    if($("salWorkDays")) $("salWorkDays").value = workDays;
 
-    // Toplam Havuz = Aylık Ücret * Öğrenci Sayısı
-    const pool = monthlyFee * studentCount;
-    if($("salTotalPool")) {
-      $("salTotalPool").value = pool;
-    }
+    // Ders Saati Tablosu'nu da güncelle (çünkü totalPool ve workDays değişmiş olabilir)
+    updateDersSaatiTablosu(totalPool, workDays);
+
+    // Maaşları ve Özet Tablosunu yenile
+    renderSalaries();
   }
 
-  // Event listenerları bağlayalım
-  if($("salHourlyRate")) $("salHourlyRate").addEventListener("input", () => autoCalculatePool('rate'));
-  if($("salDailyHours")) $("salDailyHours").addEventListener("input", () => autoCalculatePool('hours_days'));
-  if($("salWorkDays")) $("salWorkDays").addEventListener("input", () => autoCalculatePool('hours_days'));
-  if($("salTotalLessons")) $("salTotalLessons").addEventListener("input", () => autoCalculatePool('lessons'));
-  if($("salStudentCount")) $("salStudentCount").addEventListener("input", () => autoCalculatePool('students'));
-  if($("salGroupCount")) $("salGroupCount").addEventListener("input", () => autoCalculatePool('group'));
-  if($("salCoefficient")) $("salCoefficient").addEventListener("input", () => autoCalculatePool('coeff'));
-  if($("salIndicator")) $("salIndicator").addEventListener("input", () => autoCalculatePool('indicator'));
+  function updateDersSaatiTablosu(totalPool, workDays) {
+    if (!$("yeni_dersGroupCount")) return;
+
+    const groupCount = Number($("yeni_dersGroupCount").value) || 0;
+    const dailyTotal = Number($("yeni_dersDailyTotal").value) || 0;
+    const coordinator = Number($("yeni_dersCoordinator").value) || 0;
+
+    // 3- Ders Yapılan Gün Sayısı'nı güncelle
+    $("yeni_dersWorkDays").value = workDays;
+
+    // 4- Aylık Toplam Ders Sayısı: Kulüp Grup X Günlük Ders Saati X Ders Yapılan Gün
+    const monthlyTotalLessons = groupCount * dailyTotal * workDays;
+    $("yeni_dersMonthlyTotal").value = monthlyTotalLessons;
+
+    // 6- GENEL TOPLAM: Aylık Toplam Ders + KOORDİNATÖRLÜK
+    const grandTotal = monthlyTotalLessons + coordinator;
+    $("yeni_dersGrandTotal").value = grandTotal;
+
+    // 7- SAAT ÜCRETİ (Hesaplanan): Aylık Aidat Toplamı X 0.55 / Genel Toplam
+    let calculatedHourlyRate = 0;
+    if (grandTotal > 0) {
+      calculatedHourlyRate = (totalPool * 0.55) / grandTotal;
+    }
+    $("yeni_dersHourlyRateCalculated").value = formatTL(calculatedHourlyRate);
+
+    // Arkaplana hesaplanan saat ücretini aktaralım
+    window.calculatedDersSaatUcreti = calculatedHourlyRate;
+  }
+
+  // Yeni tablodaki inputlara event listener ekle
+  const yeniInputIds = [
+    "yeni_salCoefficient", "yeni_salIndicator", "yeni_salHourlyRate",
+    "yeni_salDailyHours", "yeni_salWorkDays", "yeni_salStudentCount",
+    "yeni_dersGroupCount", "yeni_dersDailyTotal", "yeni_dersCoordinator"
+  ];
+  yeniInputIds.forEach(id => {
+    if($(id)) {
+      $(id).addEventListener("input", updateNewPricingTable);
+    }
+  });
+
+  // Modal açıldığında da güncelleyelim (eski logic yerine)
+  const oldOpenSalaryModal = openSalaryModal;
+  window.openSalaryModal = function() {
+    oldOpenSalaryModal(); // bu salMonth gibi şeyleri ayarlar
+
+    // Öğrenci sayısını otomatik olarak tablodan çekip doldurabiliriz (opsiyonel)
+    if(!$("yeni_salStudentCount").value) {
+      $("yeni_salStudentCount").value = state.students.length;
+    }
+
+    updateNewPricingTable();
+  }
 
   // Özel yüzde göster/gizle
   if($("pRole")) {
@@ -1773,13 +1933,27 @@
         else if(p.role === "deputy") gross = totalPool * 0.05;
         else if(p.role === "accounting") gross = totalPool * 0.02;
         else if(p.role === "cleaning") gross = totalPool * 0.04;
-        else if(p.role === "teacher_pool") gross = teacherPerPerson;
+        else if(p.role === "teacher_pool") {
+          let isCoordinator = p.name.toLowerCase().includes("koordinatör");
+          let isUsta = p.name.toLowerCase().includes("usta öğretici");
+          if (p.name.toLowerCase().includes("öğretmen") || isCoordinator || isUsta) {
+             const calculatedHourlyRateExcel = window.calculatedDersSaatUcreti || hourlyRate;
+             const dailyTotalLessons = Number($("yeni_dersDailyTotal").value) || 0;
+             const aylikDersSayisi = dailyTotalLessons * workDays;
+             gross = aylikDersSayisi * calculatedHourlyRateExcel;
+          } else {
+             gross = teacherPerPerson;
+          }
+        }
         else if(p.role === "custom") gross = totalPool * (Number(p.percent) / 100);
 
         let multiplier = 2.0; // default for unknown/accounting/cleaning/custom
         if(p.role === "manager") multiplier = 2.75;
         else if(p.role === "deputy") multiplier = 2.5;
-        else if(p.role === "teacher_pool") multiplier = isCoordinator ? 2.75 : 4.0;
+        else if(p.role === "teacher_pool") {
+          let isCoordinator = p.name.toLowerCase().includes("koordinatör");
+          multiplier = isCoordinator ? 2.75 : 4.0;
+        }
         else if(p.role === "accounting" || p.role === "cleaning") multiplier = 2.0;
 
         let maxGross = baseSalary * multiplier;
